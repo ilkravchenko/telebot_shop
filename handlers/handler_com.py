@@ -14,7 +14,7 @@ class HandlerCommands(Handler):
         """
         Обрабатывает входящие /start команды
         """
-        self.BD._add_user(message.from_user.id ,message.from_user.first_name)
+        # self.BD._add_user(message.from_user.id ,message.from_user.first_name)
         self.bot.send_message(message.chat.id,
                               f"{message.from_user.first_name},"
                               f"Здравствуйте! Добро пожаловать в наш магазин!",
