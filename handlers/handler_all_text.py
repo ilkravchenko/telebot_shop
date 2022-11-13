@@ -266,7 +266,7 @@ class HandlerAllText(Handler):
         # Вывожу айди - товар
         all_products = self.BD.select_all_products()
         for ind, itm in enumerate(all_products, start=1):
-            self.bot.send_message(message.chat.id, str(ind) + itm)
+            self.bot.send_message(message.chat.id, str(ind) + str(itm))
         self.bot.send_message(message.chat.id, "А теперь можете выбрать товар и изменить о нем информацию\n"
                                                "записав в виде - <b>айди товара : имя товара, производитель, цена, количество</b>\n"
                                                "Категории которые есть(ввести только цыфру!)?\n"
