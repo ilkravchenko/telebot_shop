@@ -276,7 +276,7 @@ class HandlerAllText(Handler):
                               parse_mode='HTML')
 
     def change_product(self, message):
-        product_id, data_from_tg = text.split(":")
+        product_id, data_from_tg = message.text.split(":")
         data_from_tg = data_from_tg.split(",")
         name = data_from_tg[0].lstrip()
         title = data_from_tg[1]
