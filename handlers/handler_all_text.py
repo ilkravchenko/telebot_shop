@@ -240,16 +240,19 @@ class HandlerAllText(Handler):
         self.bot.send_message(message.chat.id, "Введите производителя товара.")
         self.bot.send_message(message.chat.id, "Введите цену товара.")
         self.bot.send_message(message.chat.id, "Введите количество товара.")
-        self.bot.send_message(message.chat.id, "Вношу товар в базу данные, подождите сообщение об успешной операции")
 
         data_from_tg = message.text.split(",")
+        self.bot.send_message(message.chat.id, data_from_tg)
         category = data_from_tg[0]
         name = data_from_tg[1]
         title = data_from_tg[2]
         price = data_from_tg[3]
         quantity = data_from_tg[4]
 
+
+        self.bot.send_message(message.chat.id, "Вношу товар в базу данные, подождите сообщение об успешной операции")
         self.BD._add_product(name, title, price, quantity, category)
+        self.bot.send_message(message.chat.id, "Данные внесены")
 
 
     def handle(self):
