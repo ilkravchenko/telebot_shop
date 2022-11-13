@@ -202,7 +202,7 @@ class HandlerAllText(Handler):
             self.BD.select_order_quantity(product_id, message.from_user.id)),
                               parse_mode="HTML",
                               reply_markup=self.keyboards.order_menu(
-                                  self.step, quantity))
+                                  self.step, quantity, message.from_user.id))
 
     def handle(self):
         """
