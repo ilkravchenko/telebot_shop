@@ -229,33 +229,18 @@ class HandlerAllText(Handler):
         """
         Обрабатывает входящие текстовые сообщения от нажатия на кнопку "Добавить товар"
         """
-        ask_category = self.bot.send_message(message.chat.id, "Какой категории товар желаете добавить?\n"
+        self.bot.send_message(message.chat.id, "Какой категории товар желаете добавить?\n"
                                                               "1 - Телефоны\n"
                                                               "2 - Компьютеры\n"
                                                               "3 - Телевизоры")
-        self.bot.register_next_step_handler(ask_category, category_handler)
-
-    def category_handler(self, message):
         category = message.text
-        ask_name = self.bot.send_message(message.chat.id, "Введите название товара.")
-        self.bot.register_next_step_handler(ask_name, name_handler, category)
-
-    def name_handler(self, message, category):
+        self.bot.send_message(message.chat.id, "Введите название товара.")
         name = message.text
-        ask_title = self.bot.send_message(message.chat.id, "Введите производителя товара.")
-        self.bot.register_next_step_handler(ask_title, title_handler, category, name)
-
-    def title_handler(self, message, category, name):
+        self.bot.send_message(message.chat.id, "Введите производителя товара.")
         title = message.text
-        ask_price = self.bot.send_message(message.chat.id, "Введите цену товара.")
-        self.bot.register_next_step_handler(ask_price, price_handler, category, name, title)
-
-    def price_handler(self, message, category, name, title):
+        self.bot.send_message(message.chat.id, "Введите цену товара.")
         price = message.text
-        ask_quantity = self.bot.send_message(message.chat.id, "Введите количество товара.")
-        self.bot.register_next_step_handler(ask_quantity, quantity_handler, category, name, title, price)
-
-    def quantity_handler(self, message, category, name, title, price):
+        self.bot.send_message(message.chat.id, "Введите количество товара.")
         quantity = message.text
         self.bot.send_message(message.chat.id, "Вношу товар в базу данные, подождите сообщение об успешной операции")
         self.BD._add_product(name, title, price, quantity, category)
