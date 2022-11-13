@@ -125,6 +125,12 @@ admin_settings = """
 
 """
 
+applay_order = """
+<b>Заказ который надо оформить!!!</b>
+
+Вот айди заказа который надо отправить пользователю:
+<b>{}</b>
+"""
 # словарь ответов пользователю
 MESSAGES = {
     'trading_store': trading_store,
@@ -134,5 +140,6 @@ MESSAGES = {
     'no_orders': no_orders,
     'applay': applay,
     'settings': settings,
-    'admin_settings': admin_settings
+    'admin_settings': admin_settings,
+    'applay_order': applay_order
 }

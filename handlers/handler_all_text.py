@@ -132,6 +132,9 @@ class HandlerAllText(Handler):
                               parse_mode='HTML',
                               reply_markup=self.keyboards.category_menu())
         # Удаляю данные с таблицы заказа
+        all_product_id = self.BD.select_all_product_id(message.from_user.id)
+        self.bot.send_message(config.ADMIN,MESSAGES['applay_order'].format(
+            all_product_id))
         self.BD.delete_all_order(message.from_user.id)
 
     def pressed_btn_category(self, message):
@@ -229,7 +232,7 @@ class HandlerAllText(Handler):
         """
         Обрабатывает входящие текстовые сообщения от нажатия на кнопку "Добавить товар"
         """
-        self.bot.send_message(message.chat.id, "Введите сю информацию ниже через запятую!!!!!")
+        self.bot.send_message(message.chat.id, "Введите всю информацию ниже через запятую!!!!!")
         self.bot.send_message(message.chat.id, "Какой категории товар желаете добавить?\n"
                                                               "1 - Телефоны\n"
                                                               "2 - Компьютеры\n"
@@ -239,8 +242,6 @@ class HandlerAllText(Handler):
         self.bot.send_message(message.chat.id, "Введите производителя товара.")
         self.bot.send_message(message.chat.id, "Введите цену товара.")
         self.bot.send_message(message.chat.id, "Введите количество товара.")
-
-
 
     def add_product(self, message):
         data_from_tg = message.text.split(",")
@@ -253,8 +254,38 @@ class HandlerAllText(Handler):
 
         self.bot.send_message(message.chat.id, "Вношу товар в базу данные, подождите сообщение об успешной операции")
         self.BD._add_product(name, title, price, quantity, category)
-        self.bot.send_message(message.chat.id, "Данные внесены")
+        self.bot.send_message(message.chat.id, "Данные внесены",
+                              reply_markup=self.keyboards.start_menu_admin())
 
+    def pressed_btn_change_product(self, message):
+        """
+        Обрабатывает входящие текстовые сообщения от нажатия на кнопку "Изменить товар"
+        """
+        # Получаю все айди товара
+        all_product_id = self.BD.select_all_product_id('all')
+        # Вывожу айди - товар
+        all_products = self.BD.select_all_products()
+        for itm in all_products:
+            print(itm)
+        self.bot.send_message(message.chat.id, "А теперь можете выбрать товар и изменить о нем информацию\n"
+                                               "записав в виде - <b>айди товара : имя товара, производитель, цена, количество</b>\n"
+                                               "Категории которые есть(ввести только цыфру!)?\n"
+                                                              "1 - Телефоны\n"
+                                                              "2 - Компьютеры\n"
+                                                              "3 - Телевизоры\n")
+
+    def сhange_product(self, message):
+        product_id, data_from_tg = message.text.split(":")
+        name = data_from_tg[0]
+        title = data_from_tg[1]
+        price = data_from_tg[2]
+        quantity = data_from_tg[3]
+
+
+        self.bot.send_message(message.chat.id, "Вношу товар в базу данные, подождите сообщение об успешной операции")
+        self.BD.change_product(product_id, name, title, price, quantity)
+        self.bot.send_message(message.chat.id, "Данные внесены",
+                              reply_markup=self.keyboards.start_menu_admin())
 
     def handle(self):
         """
@@ -295,8 +326,8 @@ class HandlerAllText(Handler):
             elif message.text == config.KEYBOARD['ADD_PRODUCT']:
                 self.pressed_btn_add_product(message)
 
-            #elif message.text == config.KEYBOARD[CHANGE_PRODUCT]:
-            #    self.pressed_btn_back(message)
+            elif message.text == config.KEYBOARD[CHANGE_PRODUCT]:
+                self.pressed_btn_change_product(message)
 
             #*********** меню категирии товаров (Телефоны, компьютеры, телевизоры)***********#
 
@@ -333,6 +364,9 @@ class HandlerAllText(Handler):
                     self.bot.send_message(message.chat.id, message.text)
                 else:
                     try:
-                        self.add_product(message)
+                        if ':' in message.text:
+                            self.change_product(message)
+                        else:
+                            self.add_product(message)
                     except:
                         self.bot.send_message(message.chat.id, message.text)

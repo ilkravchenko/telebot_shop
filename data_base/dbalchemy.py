@@ -51,6 +51,14 @@ class DBManager(metaclass=Singleton):
         self.close()
         return result
 
+    def select_all_products(self):
+        """
+        Возвращает все строки товаров из категории
+        """
+        result = self._session.query(Products).all()
+        self.close()
+        return result
+
     # Добавление юзера в таблицу
     def _add_user(self, user_id, user_name):
         """
@@ -106,11 +114,28 @@ class DBManager(metaclass=Singleton):
         self._session.commit()
         self.close()
 
+    def change_product(self, product_id, name, title, price, quantity):
+        """
+        Метод изменения товара
+        """
+        self._session.query(Products).filter_by(id=product_id).update(
+            {
+                Products.name: name,
+                Products.title: title,
+                Products.price: price,
+                Products.quantity: quantity
+            })
+        self._session.commit()
+        self.close()
+
     def select_all_product_id(self, chat_id):
         """
         Возвращает все id товара в заказе
         """
-        result = self._session.query(Order.product_id).filter_by(user_id=chat_id).all()
+        if chat_id != 'all':
+            result = self._session.query(Order.product_id).filter_by(user_id=chat_id).all()
+        else:
+            result = self._session.query(Order.product_id).all()
         self.close()
         # конвертирую результат выборки
         return  utility._convert(result)
@@ -212,7 +237,7 @@ class DBManager(metaclass=Singleton):
         Удаляет данные всего заказа в соответствии с user_id
         """
         all_in_order = self.select_all_order_id(user_id)
-
+        result = []
         for itm in all_in_order:
             self._session.query(Order).filter_by(id=itm).delete()
             self._session.commit()
