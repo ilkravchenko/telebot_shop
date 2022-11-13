@@ -216,16 +216,16 @@ class HandlerAllText(Handler):
             if message.text == config.KEYBOARD['CHOOSE_GOODS']:
                 self.pressed_btn_category(message)
 
-            if message.text == config.KEYBOARD['INFO']:
+            elif message.text == config.KEYBOARD['INFO']:
                 self.pressed_btn_info(message)
 
-            if message.text == config.KEYBOARD['SETTINGS']:
+            elif message.text == config.KEYBOARD['SETTINGS']:
                 self.pressed_btn_settings(message)
 
-            if message.text == config.KEYBOARD['<<']:
+            elif message.text == config.KEYBOARD['<<']:
                 self.pressed_btn_back(message)
 
-            if message.text == config.KEYBOARD["ORDER"]:
+            elif message.text == config.KEYBOARD["ORDER"]:
                 # Если есть заказ
                 if self.BD.count_rows_order(message.from_user.id) > 0:
                     self.pressed_btn_order(message)
@@ -237,33 +237,33 @@ class HandlerAllText(Handler):
 
             #*********** меню категирии товаров (Телефоны, компьютеры, телевизоры)***********#
 
-            if message.text == config.KEYBOARD["PHONES"]:
+            elif message.text == config.KEYBOARD["PHONES"]:
                 self.pressed_btn_product(message, 'PHONES')
 
-            if message.text == config.KEYBOARD['COMPUTERS']:
+            elif message.text == config.KEYBOARD['COMPUTERS']:
                 self.pressed_btn_product(message, 'COMPUTERS')
 
-            if message.text == config.KEYBOARD['TV']:
+            elif message.text == config.KEYBOARD['TV']:
                 self.pressed_btn_product(message, 'TV')
 
             #*********** меню закза *************#
 
-            if message.text == config.KEYBOARD['UP']:
+            elif message.text == config.KEYBOARD['UP']:
                 self.pressed_btn_up(message)
 
-            if message.text == config.KEYBOARD['DOWN']:
+            elif message.text == config.KEYBOARD['DOWN']:
                 self.pressed_btn_down(message)
 
-            if message.text == config.KEYBOARD['X']:
+            elif message.text == config.KEYBOARD['X']:
                 self.pressed_btn_x(message)
 
-            if message.text == config.KEYBOARD['NEXT_STEP']:
+            elif message.text == config.KEYBOARD['NEXT_STEP']:
                 self.pressed_btn_next_step(message)
 
-            if message.text == config.KEYBOARD['BACK_STEP']:
+            elif message.text == config.KEYBOARD['BACK_STEP']:
                 self.pressed_btn_back_step(message)
 
-            if message.text == config.KEYBOARD['APPLAY']:
+            elif message.text == config.KEYBOARD['APPLAY']:
                 self.pressed_btn_applay(message)
             else:
                 self.bot.send_message(message.chat.id, message.text)
