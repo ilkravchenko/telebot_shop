@@ -326,7 +326,7 @@ class HandlerAllText(Handler):
             elif message.text == config.KEYBOARD['ADD_PRODUCT']:
                 self.pressed_btn_add_product(message)
 
-            elif message.text == config.KEYBOARD[CHANGE_PRODUCT]:
+            elif message.text == config.KEYBOARD['CHANGE_PRODUCT']:
                 self.pressed_btn_change_product(message)
 
             #*********** меню категирии товаров (Телефоны, компьютеры, телевизоры)***********#
