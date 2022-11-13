@@ -24,7 +24,7 @@ COUNT = 0
 KEYBOARD = {
     'ADMIN_MENU': emojize('©️Меню Админа'),
     'ADD_PRODUCT': emojize(':pushpin: Добавить товар'),
-    'CHANGE_PRODUCT': emojize(':pencil2: Изменить товар'),
+    'CHANGE_PRODUCT': emojize(':pencil2: Изменить товар', language='alias'),
     'CHOOSE_GOODS': emojize(':open_file_folder: Выбрать товар'),
     'INFO': emojize(':speech_balloon: Информация о магазине'),
     'SETTINGS': emojize('⚙️ Настройки'),
