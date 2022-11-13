@@ -265,14 +265,15 @@ class HandlerAllText(Handler):
         all_product_id = self.BD.select_all_product_id('all')
         # Вывожу айди - товар
         all_products = self.BD.select_all_products()
-        for itm in all_products:
-            print(itm)
+        for ind, itm in enumerate(all_products, start=1):
+            self.bot.send_message(message.chat.id, str(ind) + itm)
         self.bot.send_message(message.chat.id, "А теперь можете выбрать товар и изменить о нем информацию\n"
                                                "записав в виде - <b>айди товара : имя товара, производитель, цена, количество</b>\n"
                                                "Категории которые есть(ввести только цыфру!)?\n"
                                                               "1 - Телефоны\n"
                                                               "2 - Компьютеры\n"
-                                                              "3 - Телевизоры\n")
+                                                              "3 - Телевизоры\n",
+                              parse_mode='HTML')
 
     def сhange_product(self, message):
         product_id, data_from_tg = message.text.split(":")
