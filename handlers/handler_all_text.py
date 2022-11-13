@@ -229,20 +229,26 @@ class HandlerAllText(Handler):
         """
         Обрабатывает входящие текстовые сообщения от нажатия на кнопку "Добавить товар"
         """
+        self.bot.send_message(message.chat.id, "Введите сю информацию ниже через запятую!!!!!")
         self.bot.send_message(message.chat.id, "Какой категории товар желаете добавить?\n"
                                                               "1 - Телефоны\n"
                                                               "2 - Компьютеры\n"
-                                                              "3 - Телевизоры")
+                                                              "3 - Телевизоры\n"
+                                               "для этого пункта введите только цыфру!!!!!")
         category = message.text
         self.bot.send_message(message.chat.id, "Введите название товара.")
-        name = message.text
         self.bot.send_message(message.chat.id, "Введите производителя товара.")
-        title = message.text
         self.bot.send_message(message.chat.id, "Введите цену товара.")
-        price = message.text
         self.bot.send_message(message.chat.id, "Введите количество товара.")
-        quantity = message.text
         self.bot.send_message(message.chat.id, "Вношу товар в базу данные, подождите сообщение об успешной операции")
+
+        data_from_tg = message.text.split(",")
+        category = data_from_tg[0]
+        name = data_from_tg[1]
+        title = data_from_tg[2]
+        price = data_from_tg[3]
+        quantity = data_from_tg[4]
+
         self.BD._add_product(name, title, price, quantity, category)
 
 
