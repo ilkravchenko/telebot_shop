@@ -276,16 +276,18 @@ class HandlerAllText(Handler):
                               parse_mode='HTML')
 
     def change_product(self, message):
-        product_id, data_from_tg = message.text.split(":")
-        name = data_from_tg[0]
+        product_id, data_from_tg = text.split(":")
+        data_from_tg = data_from_tg.split(",")
+        name = data_from_tg[0].lstrip()
         title = data_from_tg[1]
         price = data_from_tg[2]
         quantity = data_from_tg[3]
+        print(product_id, name, title, price, quantity)
 
 
-        self.bot.send_message(message.chat.id, "Вношу товар в базу данные, подождите сообщение об успешной операции")
+        self.bot.send_message(message.chat.id, "Изменяю данные по данному товару, подождите сообщение об успешной операции")
         self.BD.change_product(product_id, name, title, price, quantity)
-        self.bot.send_message(message.chat.id, "Данные внесены",
+        self.bot.send_message(message.chat.id, "Данные изменены",
                               reply_markup=self.keyboards.start_menu_admin())
 
     def handle(self):
