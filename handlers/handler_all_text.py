@@ -235,14 +235,15 @@ class HandlerAllText(Handler):
                                                               "2 - Компьютеры\n"
                                                               "3 - Телевизоры\n"
                                                "для этого пункта введите только цыфру!!!!!")
-        category = message.text
         self.bot.send_message(message.chat.id, "Введите название товара.")
         self.bot.send_message(message.chat.id, "Введите производителя товара.")
         self.bot.send_message(message.chat.id, "Введите цену товара.")
         self.bot.send_message(message.chat.id, "Введите количество товара.")
 
+
+
+    def add_product(self, message):
         data_from_tg = message.text.split(",")
-        self.bot.send_message(message.chat.id, data_from_tg)
         category = data_from_tg[0]
         name = data_from_tg[1]
         title = data_from_tg[2]
@@ -328,4 +329,10 @@ class HandlerAllText(Handler):
             elif message.text == config.KEYBOARD['APPLAY']:
                 self.pressed_btn_applay(message)
             else:
-                self.bot.send_message(message.chat.id, message.text)
+                if message.chat.id != config.ADMIN:
+                    self.bot.send_message(message.chat.id, message.text)
+                else:
+                    try:
+                        self.add_product(message)
+                    except:
+                        self.bot.send_message(message.chat.id, message.text)
