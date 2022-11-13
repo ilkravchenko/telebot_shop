@@ -11,7 +11,7 @@ the link [Tech Shop](https://t.me/Techshop2022Bot).
 
 ## Documentation
 
-- [pyTelegramBotAPIn](https://core.telegram.org/bots/api)
+- [pyTelegramBotAPI](https://core.telegram.org/bots/api)
 - [SQLAlchemy](https://docs.sqlalchemy.org/en/14/)
 - [Emoji](https://pypi.org/project/emoji/)
 
