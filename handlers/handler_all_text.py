@@ -143,6 +143,15 @@ class HandlerAllText(Handler):
         self.bot.send_message(message.chat.id, "Выберите категорию",
                               reply_markup=self.keyboards.category_menu())
 
+    def pressed_btn_admin(self, message):
+        """
+        Обрабатывает входящие текстовые сообщения от нажатия на кнопку "Меню Админа"
+        """
+        self.bot.send_message(message.chat.id, "Меню Админа",
+                              reply_markup=self.keyboards.remove_menu())
+        self.bot.send_message(message.chat.id, "Выберите категорию",
+                              reply_markup=self.keyboards.admin_menu())
+
     def pressed_btn_info(self, message):
         """
         Обрабатывает входящие текстовые сообщения от нажатия на кнопку "О магазине"
@@ -159,12 +168,24 @@ class HandlerAllText(Handler):
                               parse_mode='HTML',
                               reply_markup=self.keyboards.settings_menu())
 
+    def pressed_btn_admin_settings(self, message):
+        """
+        Обрабатывает входящие текстовые сообщения от нажатия на кнопку "Настройки" в меню для админа
+        """
+        self.bot.send_message(message.chat.id, MESSAGES['admin_settings'],
+                              parse_mode='HTML',
+                              reply_markup=self.keyboards.admin_settings_menu())
+
     def pressed_btn_back(self, message):
         """
         Обрабатывает входящие текстовые сообщения от нажатия на кнопку "Назад"
         """
-        self.bot.send_message(message.chat.id, "Вы вернулись назад",
-                              reply_markup=self.keyboards.start_menu())
+        if message.from_user.id == config.ADMIN:
+            self.bot.send_message(message.chat.id, "Вы вернулись назад",
+                                  reply_markup=self.keyboards.start_menu_admin())
+        else:
+            self.bot.send_message(message.chat.id, "Вы вернулись назад",
+                                  reply_markup=self.keyboards.start_menu())
 
     def pressed_btn_product(self, message, product):
         """
@@ -204,6 +225,42 @@ class HandlerAllText(Handler):
                               reply_markup=self.keyboards.order_menu(
                                   self.step, quantity, message.from_user.id))
 
+    def pressed_btn_add_product(self, message):
+        """
+        Обрабатывает входящие текстовые сообщения от нажатия на кнопку "Добавить товар"
+        """
+        ask_category = self.bot.send_message(message.chat.id, "Какой категории товар желаете добавить?\n"
+                                                              "1 - Телефоны\n"
+                                                              "2 - Компьютеры\n"
+                                                              "3 - Телевизоры")
+        self.bot.register_next_step_handler(ask_category, category_handler)
+
+    def category_handler(self, message):
+        category = message.text
+        ask_name = self.bot.send_message(message.chat.id, "Введите название товара.")
+        self.bot.register_next_step_handler(ask_name, name_handler, category)
+
+    def name_handler(self, message, category):
+        name = message.text
+        ask_title = self.bot.send_message(message.chat.id, "Введите производителя товара.")
+        self.bot.register_next_step_handler(ask_title, title_handler, category, name)
+
+    def title_handler(self, message, category, name):
+        title = message.text
+        ask_price = self.bot.send_message(message.chat.id, "Введите цену товара.")
+        self.bot.register_next_step_handler(ask_price, price_handler, category, name, title)
+
+    def price_handler(self, message, category, name, title):
+        price = message.text
+        ask_quantity = self.bot.send_message(message.chat.id, "Введите количество товара.")
+        self.bot.register_next_step_handler(ask_quantity, quantity_handler, category, name, title, price)
+
+    def quantity_handler(self, message, category, name, title, price):
+        quantity = message.text
+        self.bot.send_message(message.chat.id, "Вношу товар в базу данные, подождите сообщение об успешной операции")
+        self.BD._add_product(name, title, price, quantity, category)
+
+
     def handle(self):
         """
         Обработчик(декоратор) сообщений,
@@ -215,6 +272,9 @@ class HandlerAllText(Handler):
 
             if message.text == config.KEYBOARD['CHOOSE_GOODS']:
                 self.pressed_btn_category(message)
+
+            elif message.text == config.KEYBOARD['ADMIN_MENU']:
+                self.pressed_btn_admin(message)
 
             elif message.text == config.KEYBOARD['INFO']:
                 self.pressed_btn_info(message)
@@ -234,6 +294,14 @@ class HandlerAllText(Handler):
                         message.chat.id, MESSAGES['no_orders'],
                         parse_mode="HTML",
                         reply_markup=self.keyboards.category_menu())
+
+            #*********** меню для Админа **************#
+
+            elif message.text == config.KEYBOARD['ADD_PRODUCT']:
+                self.pressed_btn_add_product(message)
+
+            #elif message.text == config.KEYBOARD[CHANGE_PRODUCT]:
+            #    self.pressed_btn_back(message)
 
             #*********** меню категирии товаров (Телефоны, компьютеры, телевизоры)***********#
 

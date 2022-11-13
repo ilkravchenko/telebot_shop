@@ -59,10 +59,7 @@ class DBManager(metaclass=Singleton):
         # Получаю список всех user_id
         all_in_users = self.select_all_users_id()
         # Если есть даные в списке заглушка
-        if user_id in all_in_users:
-            pass
-        # Если нет - добавляю юзера
-        else:
+        if user_id not in all_in_users:
             user = Users(id=user_id, name=user_name)
 
         self._session.add(user)
@@ -95,6 +92,17 @@ class DBManager(metaclass=Singleton):
             self.update_product_value(product_id, 'quantity', quantity_product)
 
         self._session.add(order)
+        self._session.commit()
+        self.close()
+
+    def _add_product(self, name, title, price, quantity, category):
+        """
+        Метод добавления товара
+        """
+        product = Products(name=name, title=title, price=price,quantity=quantity,
+                           is_active=1, category_id=category)
+
+        self._session.add(product)
         self._session.commit()
         self.close()
 

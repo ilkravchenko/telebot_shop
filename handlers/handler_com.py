@@ -1,6 +1,7 @@
 # Импортирую класс родитель
 from handlers.handler import Handler
 
+from settings.config import ADMIN
 from settings.message import MESSAGES
 
 class HandlerCommands(Handler):
@@ -15,10 +16,16 @@ class HandlerCommands(Handler):
         Обрабатывает входящие /start команды
         """
         # self.BD._add_user(message.from_user.id ,message.from_user.first_name)
-        self.bot.send_message(message.chat.id,
-                              f"{message.from_user.first_name},"
-                              f"Здравствуйте! Добро пожаловать в наш магазин!",
-                              reply_markup=self.keyboards.start_menu())
+        if message.from_user.id == ADMIN:
+            self.bot.send_message(message.chat.id,
+                                  f"{message.from_user.first_name},"
+                                  f"Добро пожаловать Админ!",
+                                  reply_markup=self.keyboards.start_menu_admin())
+        else:
+            self.bot.send_message(message.chat.id,
+                                  f"{message.from_user.first_name},"
+                                  f"Здравствуйте! Добро пожаловать в наш магазин!",
+                                  reply_markup=self.keyboards.start_menu())
 
     def pressed_btn_help(self, message):
         """

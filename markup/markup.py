@@ -30,6 +30,31 @@ class Keyboards:
 
         return KeyboardButton(config.KEYBOARD[name])
 
+    def start_menu_admin(self):
+        """
+        Создает разметку кнопок в основном меню для админа
+        """
+        self.markup = ReplyKeyboardMarkup(True, True)
+        itm_btn_1 = self.set_btn("ADMIN_MENU")
+        itm_btn_2 = self.set_btn("CHOOSE_GOODS")
+        itm_btn_3 = self.set_btn("INFO")
+        itm_btn_4 = self.set_btn("ADMIN_SETTINGS")
+        # Расположение кнопок в меню
+        self.markup.row(itm_btn_1)
+        self.markup.row(itm_btn_2)
+        self.markup.row(itm_btn_3, itm_btn_4)
+        return self.markup
+
+    def admin_menu(self):
+        """
+        Создает разметку кнопок в меню Админа для изменения таблиц
+        """
+        self.markup = ReplyKeyboardMarkup(True, True, row_width=1)
+        self.markup.add(self.set_btn("ADD_PRODUCT"))
+        self.markup.add(self.set_btn("CHANGE_PRODUCT"))
+        self.markup.row(self.set_btn('<<'))
+
+        return self.markup
     def start_menu(self):
         """
         Создает разметку кнопок в основном меню и возвращает разметку
@@ -56,6 +81,16 @@ class Keyboards:
     def settings_menu(self):
         """
         Создает разметку кнопок в меню "Настройки"
+        """
+        self.markup = ReplyKeyboardMarkup(True, True)
+        itm_btn_1 = self.set_btn('<<')
+        # Расположение кнопок в меню
+        self.markup.row(itm_btn_1)
+        return self.markup
+
+    def admin_settings_menu(self):
+        """
+        Создает разметку кнопок в меню админа "Настройки"
         """
         self.markup = ReplyKeyboardMarkup(True, True)
         itm_btn_1 = self.set_btn('<<')

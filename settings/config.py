@@ -10,6 +10,8 @@ NAME_DB = 'products.db'
 VERSION = '0.0.1'
 # Author
 AUTHOR = 'Illia Kravchenko'
+# admin
+ADMIN = 535984986
 
 # родительськая директория
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -20,9 +22,13 @@ COUNT = 0
 
 # кнопки управления
 KEYBOARD = {
+    'ADMIN_MENU': emojize('©️Меню Админа'),
+    'ADD_PRODUCT': emojize(':pushpin: Добавить товар'),
+    'CHANGE_PRODUCT': emojize(':pencil2: Изменить товар'),
     'CHOOSE_GOODS': emojize(':open_file_folder: Выбрать товар'),
     'INFO': emojize(':speech_balloon: Информация о магазине'),
     'SETTINGS': emojize('⚙️ Настройки'),
+    'ADMIN_SETTINGS': emojize('⚙️ Настройки'),
     'PHONES': emojize(':iphone: Телефоны', language='alias'),
     'COMPUTERS': emojize(':computer: Компьютеры', language='alias'),
     'TV': emojize(':tv: Телевизоры', language='alias'),
