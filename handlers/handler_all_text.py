@@ -133,9 +133,27 @@ class HandlerAllText(Handler):
                               reply_markup=self.keyboards.category_menu())
         # Удаляю данные с таблицы заказа
         all_product_id = self.BD.select_all_product_id(message.from_user.id)
-        self.bot.send_message(config.ADMIN,MESSAGES['applay_order'].format(
-            all_product_id))
+
+        self.bot.send_message(message.from_user.id, "Введите пожалуйста ваш номер, чтобы админ мог с вами связаться:")
+        self.bot.register_next_step_handler(message, input_number)
+
+    def input_number(self, message):
+        number = message.text
+
+        if not number.isdigit():
+            msg = bot.reply_to(message, 'Можно вводить только числа!')
+            bot.register_next_step_handler(message, input_number)
+            return
+
+        self.bot.send_message(message.from_user.id, "Спасибо, отправляю все на Админа!")
+        # Получаю все айди товара из заказа пользователя
+        all_product_id = self.BD.select_all_product_id(message.from_user.id)
+        self.bot.send_message(config.ADMIN, f"Номер телфона пользователя для связи - {number}")
+        self.bot.send_message(config.ADMIN, MESSAGES['applay_order'].format(
+            message.from_user.username, all_product_id), parse_mode='HTML')
+
         self.BD.delete_all_order(message.from_user.id)
+
 
     def pressed_btn_category(self, message):
         """
@@ -232,16 +250,13 @@ class HandlerAllText(Handler):
         """
         Обрабатывает входящие текстовые сообщения от нажатия на кнопку "Добавить товар"
         """
-        self.bot.send_message(message.chat.id, "Введите всю информацию ниже через запятую!!!!!")
-        self.bot.send_message(message.chat.id, "Какой категории товар желаете добавить?\n"
+        self.bot.send_message(message.chat.id, "А теперь можете добавить товар в базу(ввести все через запятую)\n"
+                                               "записав в виде - <b>категория товара, имя товара, производитель, цена, количество</b>\n"
+                                               "Категории которые есть(ввести только цыфру!)?\n"
                                                               "1 - Телефоны\n"
                                                               "2 - Компьютеры\n"
-                                                              "3 - Телевизоры\n"
-                                               "для этого пункта введите только цыфру!!!!!")
-        self.bot.send_message(message.chat.id, "Введите название товара.")
-        self.bot.send_message(message.chat.id, "Введите производителя товара.")
-        self.bot.send_message(message.chat.id, "Введите цену товара.")
-        self.bot.send_message(message.chat.id, "Введите количество товара.")
+                                                              "3 - Телевизоры\n",
+                              parse_mode='HTML')
 
     def add_product(self, message):
         data_from_tg = message.text.split(",")
@@ -268,11 +283,7 @@ class HandlerAllText(Handler):
         for ind, itm in enumerate(all_products, start=1):
             self.bot.send_message(message.chat.id, str(ind) + ": "+ str(itm))
         self.bot.send_message(message.chat.id, "А теперь можете выбрать товар и изменить о нем информацию\n"
-                                               "записав в виде - <b>айди товара : имя товара, производитель, цена, количество</b>\n"
-                                               "Категории которые есть(ввести только цыфру!)?\n"
-                                                              "1 - Телефоны\n"
-                                                              "2 - Компьютеры\n"
-                                                              "3 - Телевизоры\n",
+                                               "записав в виде - <b>айди товара : имя товара, производитель, цена, количество</b>\n",
                               parse_mode='HTML')
 
     def change_product(self, message):
