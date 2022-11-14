@@ -27,6 +27,9 @@ class HandlerCommands(Handler):
                                   f"Здравствуйте! Добро пожаловать в наш магазин!",
                                   reply_markup=self.keyboards.start_menu())
 
+        self.bot.send_message(message.chat.id, "введи что-то")
+        self.bot.register_next_step_handler(message, hi)
+
     def pressed_btn_help(self, message):
         """
         Обрабатывает входящие /help команды
@@ -34,6 +37,10 @@ class HandlerCommands(Handler):
         self.bot.send_message(message.chat.id, MESSAGES['trading_store'],
                               parse_mode='HTML',
                               reply_markup=self.keyboards.start_menu())
+
+    def hi(self, message):
+        msg = message.text
+        self.bot.send_message(message.chat.id, f"вы ввели {msg}")
 
     def handle(self):
         # Обработчик(декоратор) сообщений
