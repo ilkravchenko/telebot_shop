@@ -134,8 +134,8 @@ class HandlerAllText(Handler):
         # Удаляю данные с таблицы заказа
         all_product_id = self.BD.select_all_product_id(message.from_user.id)
 
-        self.bot.send_message(message.from_user.id, "Введите пожалуйста ваш номер, чтобы админ мог с вами связаться:")
-        self.bot.register_next_step_handler(message, input_number)
+        msg = self.bot.send_message(message.from_user.id, "Введите пожалуйста ваш номер, чтобы админ мог с вами связаться:")
+        self.bot.register_next_step_handler(msg, input_number)
 
     def input_number(self, message):
         number = message.text
