@@ -8,7 +8,7 @@ from data_base.dbcore import Base
 from settings import config
 from models.product import Products
 from models.order import Order
-from models.users import Users
+from models.applay import Applay
 from settings import utility
 
 class Singleton(type):
@@ -51,28 +51,37 @@ class DBManager(metaclass=Singleton):
         self.close()
         return result
 
-    def select_all_products(self):
+    def select_all_applay(self):
+        """
+        Возвращает все строки заказов
+        """
+        result = self._session.query(Applay).all()
+        self.close()
+        return result
+
+    def select_all_products(self, products='all'):
         """
         Возвращает все строки товаров из категории
         """
-        result = self._session.query(Products).all()
+        if products == 'all':
+            result = self._session.query(Products).all()
+        else:
+            for i in products:
+                result = []
+                result.append(str(self._session.query(Products).filter_by(id=i).one()))
         self.close()
         return result
 
     # Добавление юзера в таблицу
-    def _add_user(self, user_id, user_name):
+    def _add_applay(self, user_id, phone, product_id, quantity):
         """
-        Метод заполнения юзера
+        Метод заполнения заказа на отправку
         """
-        # Получаю список всех user_id
-        all_in_users = self.select_all_users_id()
-        # Если есть даные в списке заглушка
-        if user_id not in all_in_users:
-            user = Users(id=user_id, name=user_name)
-
-        self._session.add(user)
+        applay = Applay(user_id=user_id, phone=phone, product_id=product_id, quantity=quantity)
+        self._session.add(applay)
         self._session.commit()
         self.close()
+
 
     # Работа с заказом
     def _add_orders(self, quantity, product_id, user_id,):
@@ -83,7 +92,7 @@ class DBManager(metaclass=Singleton):
         all_in_product = self.select_all_product_id(user_id)
         # Если есть даные в списке, обновляю таблицы заказа и продуктов
         if product_id in all_in_product:
-            quantity_order = self.select_order_quantity(product_id)
+            quantity_order = self.select_order_quantity(product_id, user_id)
             quantity_order += 1
             self.update_order_value(product_id, 'quantity', quantity_order)
 
@@ -107,26 +116,32 @@ class DBManager(metaclass=Singleton):
         """
         Метод добавления товара
         """
-        product = Products(name=name, title=title, price=price,quantity=quantity,
-                           is_active=1, category_id=category)
+        try:
+            product = Products(name=name, title=title, price=price,quantity=quantity,
+                               is_active=1, category_id=category)
 
-        self._session.add(product)
-        self._session.commit()
-        self.close()
+            self._session.add(product)
+            self._session.commit()
+            self.close()
+        except:
+            pass
 
     def change_product(self, product_id, name, title, price, quantity):
         """
         Метод изменения товара
         """
-        self._session.query(Products).filter_by(id=product_id).update(
-            {
-                Products.name: name,
-                Products.title: title,
-                Products.price: price,
-                Products.quantity: quantity
-            })
-        self._session.commit()
-        self.close()
+        try:
+            self._session.query(Products).filter_by(id=product_id).update(
+                {
+                    Products.name: name,
+                    Products.title: title,
+                    Products.price: price,
+                    Products.quantity: quantity
+                })
+            self._session.commit()
+            self.close()
+        except:
+            pass
 
     def select_all_product_id(self, chat_id):
         """
@@ -139,15 +154,6 @@ class DBManager(metaclass=Singleton):
         self.close()
         # конвертирую результат выборки
         return  utility._convert(result)
-
-    def select_all_users_id(self):
-        """
-        Возвращает все user_id
-        """
-        result = self._session.query(Users.id).all()
-        self.close()
-        # конвертирую результат выборки
-        return utility._convert(result)
 
     def select_order_quantity(self, product_id, chat_id):
         """

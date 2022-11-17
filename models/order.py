@@ -4,7 +4,6 @@ from sqlalchemy import Column, DateTime, Integer, ForeignKey
 from sqlalchemy.orm import relationship, backref
 # импортирую модель продуктов и юзера для связки моделей
 from models.product import Products
-from models.users import Users
 
 from data_base.dbcore import Base
 

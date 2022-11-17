@@ -2,6 +2,7 @@
 from settings.message import MESSAGES
 from settings import config
 from settings import utility
+import numpy as np
 # Импортирую класс родитель
 from handlers.handler import Handler
 
@@ -131,26 +132,35 @@ class HandlerAllText(Handler):
                               utility.get_total_quantity(self.BD, message.from_user.id)),
                               parse_mode='HTML',
                               reply_markup=self.keyboards.category_menu())
-        # Удаляю данные с таблицы заказа
-        all_product_id = self.BD.select_all_product_id(message.from_user.id)
 
         msg = self.bot.send_message(message.from_user.id, "Введите пожалуйста ваш номер, чтобы админ мог с вами связаться:")
-        self.bot.register_next_step_handler(msg, input_number)
+        self.bot.register_next_step_handler(msg, self.input_number)
 
     def input_number(self, message):
         number = message.text
 
         if not number.isdigit():
-            msg = bot.reply_to(message, 'Можно вводить только числа!')
-            bot.register_next_step_handler(message, input_number)
+            msg = self.bot.reply_to(message, 'Можно вводить только числа!')
+            self.bot.register_next_step_handler(message, self.input_number)
             return
 
         self.bot.send_message(message.from_user.id, "Спасибо, отправляю все на Админа!")
         # Получаю все айди товара из заказа пользователя
         all_product_id = self.BD.select_all_product_id(message.from_user.id)
-        self.bot.send_message(config.ADMIN, f"Номер телфона пользователя для связи - {number}")
-        self.bot.send_message(config.ADMIN, MESSAGES['applay_order'].format(
-            message.from_user.username, all_product_id), parse_mode='HTML')
+        product_quantity = []
+        for id in all_product_id:
+            res = self.BD.select_order_quantity(id, message.from_user.id)
+            product_quantity.append(res)
+        #all_product_id.insert(0, "id")
+        #product_quantity.insert(0, 'ед.')
+        result = np.transpose((all_product_id,product_quantity))
+        self.bot.send_message(config.ADMIN, f"Пришел новый заказ!\n"
+                                            f"Номер телфона пользователя для связи - <b>{number}</b>\n",
+                              parse_mode='HTML',
+                              reply_markup=self.keyboards.start_menu_admin())
+
+        for ind, itm in enumerate(all_product_id):
+            self.BD._add_applay(message.chat.id, number, all_product_id[ind], product_quantity[ind])
 
         self.BD.delete_all_order(message.from_user.id)
 
@@ -250,27 +260,47 @@ class HandlerAllText(Handler):
         """
         Обрабатывает входящие текстовые сообщения от нажатия на кнопку "Добавить товар"
         """
-        self.bot.send_message(message.chat.id, "А теперь можете добавить товар в базу(ввести все через запятую)\n"
-                                               "записав в виде - <b>категория товара, имя товара, производитель, цена, количество</b>\n"
-                                               "Категории которые есть(ввести только цыфру!)?\n"
-                                                              "1 - Телефоны\n"
-                                                              "2 - Компьютеры\n"
-                                                              "3 - Телевизоры\n",
+        msg = self.bot.send_message(message.chat.id, "А теперь можете внести товар в базу данных\n"
+                                               "записав в виде(все через запятую):\n<b>категория товара, имя товара, описание, цена, количество</b>\n"
+                                                     "Категории которые есть:\n"
+                                                     "1 - Телефоны\n"
+                                                     "2 - Компьютеры\n"
+                                                     "3 - Телевизоры\n",
                               parse_mode='HTML')
+        self.bot.register_next_step_handler(msg, self.add_product)
+
 
     def add_product(self, message):
-        data_from_tg = message.text.split(",")
-        category = data_from_tg[0]
-        name = data_from_tg[1]
-        title = data_from_tg[2]
-        price = data_from_tg[3]
-        quantity = data_from_tg[4]
+        try:
+            data_from_tg = message.text.split(",")
+            category = int(data_from_tg[0])
+            name = str(data_from_tg[1])
+            title = str(data_from_tg[2])
+            price = float(data_from_tg[3])
+            quantity = int(data_from_tg[4])
 
 
-        self.bot.send_message(message.chat.id, "Вношу товар в базу данные, подождите сообщение об успешной операции")
-        self.BD._add_product(name, title, price, quantity, category)
-        self.bot.send_message(message.chat.id, "Данные внесены",
+            self.bot.send_message(message.chat.id, "Вношу товар в базу данные, подождите сообщение об успешной операции")
+            self.BD._add_product(name, title, price, quantity, category)
+            self.bot.send_message(message.chat.id, "Данные внесены",
+                                  reply_markup=self.keyboards.start_menu_admin())
+        except:
+            self.bot.send_message(message.chat.id, "Возникла ошибка, вы что-то не так ввели",
+                                  reply_markup=self.keyboards.start_menu_admin())
+
+    def pressed_btn_all_products(self,message):
+        """
+        Обрабатывает входящие текстовые сообщения от нажатия на кнопку "Наши товары"
+        """
+        # Получаю все айди товара
+        all_product_id = self.BD.select_all_product_id('all')
+        # Вывожу айди - товар
+        all_products = self.BD.select_all_products()
+        for ind, itm in enumerate(all_products, start=1):
+            self.bot.send_message(message.chat.id, str(ind) + ": " + str(itm))
+        self.bot.send_message(message.chat.id, "Это все наши товары",
                               reply_markup=self.keyboards.start_menu_admin())
+
 
     def pressed_btn_change_product(self, message):
         """
@@ -282,23 +312,36 @@ class HandlerAllText(Handler):
         all_products = self.BD.select_all_products()
         for ind, itm in enumerate(all_products, start=1):
             self.bot.send_message(message.chat.id, str(ind) + ": "+ str(itm))
-        self.bot.send_message(message.chat.id, "А теперь можете выбрать товар и изменить о нем информацию\n"
-                                               "записав в виде - <b>айди товара : имя товара, производитель, цена, количество</b>\n",
+        msg = self.bot.send_message(message.chat.id, "А теперь можете выбрать товар и изменить о нем информацию\n"
+                                               "записав в виде(все через запятую):\n<b>айди товара, имя товара, производитель, цена, количество</b>\n",
                               parse_mode='HTML')
+        self.bot.register_next_step_handler(msg, self.change_product)
 
     def change_product(self, message):
-        product_id, data_from_tg = message.text.split(":")
-        data_from_tg = data_from_tg.split(",")
-        name = data_from_tg[0].lstrip()
-        title = data_from_tg[1]
-        price = data_from_tg[2]
-        quantity = data_from_tg[3]
-        print(product_id, name, title, price, quantity)
+        try:
+            data_from_tg = message.text.split(",")
+            product_id = int(data_from_tg[0])
+            name = str(data_from_tg[1])
+            title = str(data_from_tg[2])
+            price = float(data_from_tg[3])
+            quantity = int(data_from_tg[4])
 
+            self.bot.send_message(message.chat.id, "Изменяю данные по данному товару, подождите сообщение об успешной операции")
+            self.BD.change_product(product_id, name, title, price, quantity)
+            self.bot.send_message(message.chat.id, "Данные изменены",
+                                  reply_markup=self.keyboards.start_menu_admin())
+        except:
+            self.bot.send_message(message.chat.id, "Возникла ошибка, вы что-то не так ввели",
+                                  reply_markup=self.keyboards.start_menu_admin())
 
-        self.bot.send_message(message.chat.id, "Изменяю данные по данному товару, подождите сообщение об успешной операции")
-        self.BD.change_product(product_id, name, title, price, quantity)
-        self.bot.send_message(message.chat.id, "Данные изменены",
+    def pressed_btn_all_applay(self, message):
+        """
+        Обрабатывает входящие текстовые сообщения от нажатия на кнопку "Заказы на отправку"
+        """
+        all_applay = self.BD.select_all_applay()
+        for ind, itm in enumerate(all_applay, start=1):
+            self.bot.send_message(message.chat.id, str(ind) + ": " + str(itm))
+        self.bot.send_message(message.chat.id, f"Вот заказы которые надо приготовить",
                               reply_markup=self.keyboards.start_menu_admin())
 
     def handle(self):
@@ -343,6 +386,12 @@ class HandlerAllText(Handler):
             elif message.text == config.KEYBOARD['CHANGE_PRODUCT']:
                 self.pressed_btn_change_product(message)
 
+            elif message.text == config.KEYBOARD['ALL_PRODUCTS']:
+                self.pressed_btn_all_products(message)
+
+            elif message.text == config.KEYBOARD['ALL_APPLAY']:
+                self.pressed_btn_all_applay(message)
+
             #*********** меню категирии товаров (Телефоны, компьютеры, телевизоры)***********#
 
             elif message.text == config.KEYBOARD["PHONES"]:
@@ -374,13 +423,4 @@ class HandlerAllText(Handler):
             elif message.text == config.KEYBOARD['APPLAY']:
                 self.pressed_btn_applay(message)
             else:
-                if message.chat.id != config.ADMIN:
-                    self.bot.send_message(message.chat.id, message.text)
-                else:
-                    try:
-                        if ':' in message.text:
-                            self.change_product(message)
-                        else:
-                            self.add_product(message)
-                    except:
-                        self.bot.send_message(message.chat.id, message.text)
+                self.bot.send_message(message.chat.id, message.text)

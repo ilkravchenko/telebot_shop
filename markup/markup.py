@@ -52,6 +52,8 @@ class Keyboards:
         self.markup = ReplyKeyboardMarkup(True, True, row_width=1)
         self.markup.add(self.set_btn("ADD_PRODUCT"))
         self.markup.add(self.set_btn("CHANGE_PRODUCT"))
+        self.markup.add(self.set_btn('ALL_PRODUCTS'))
+        self.markup.add(self.set_btn('ALL_APPLAY'))
         self.markup.row(self.set_btn('<<'))
 
         return self.markup

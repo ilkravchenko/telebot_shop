@@ -7,7 +7,7 @@ TOKEN = '5692470746:AAG7EGor7oEU3o1CcFRT8Oy0o2l65makdpU'
 # Название БД
 NAME_DB = 'products.db'
 # version
-VERSION = '0.0.1'
+VERSION = '0.0.2'
 # Author
 AUTHOR = 'Illia Kravchenko'
 # admin
@@ -23,9 +23,11 @@ COUNT = 0
 # кнопки управления
 KEYBOARD = {
     'ADMIN_MENU': emojize('©️Меню Админа'),
+    'ALL_APPLAY':emojize(':package: Заказы на отправку', language='alias'),
     'ADD_PRODUCT': emojize(':pushpin: Добавить товар'),
     'CHANGE_PRODUCT': emojize(':pencil2: Изменить товар', language='alias'),
     'CHOOSE_GOODS': emojize(':open_file_folder: Выбрать товар'),
+    'ALL_PRODUCTS':emojize(':blue_book: Наши товары', language='alias'),
     'INFO': emojize(':speech_balloon: Информация о магазине'),
     'SETTINGS': emojize('⚙️ Настройки'),
     'ADMIN_SETTINGS': emojize('⚙️ Настройки'),

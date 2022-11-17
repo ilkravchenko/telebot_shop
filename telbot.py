@@ -39,8 +39,8 @@ class TelBot:
         # Обработчик событий
         self.start()
         # Служит для запуска бота(работа в режиме нон-стоп)
-        self.bot.enable_save_next_step_handlers(delay=2)
-        self.bot.load_next_step_handlers()
+        self.bot.enable_save_next_step_handlers(delay=2, filename='./handler-save/step.save')
+        self.bot.load_next_step_handlers(filename='./handler-save/step.save')
         self.bot.polling(none_stop=True)
 
 
